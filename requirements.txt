@@ -1,0 +1,4 @@
+beautifulsoup4==4.13.4
+pillow==11.3.0
+soupsieve==2.7
+typing_extensions==4.14.1
