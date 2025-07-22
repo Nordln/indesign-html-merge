@@ -21,7 +21,7 @@ The optimisation process consists of four sequential steps:
 
 1. **Merge multiple HTML files** into a single scrollable document
 2. **Embed all resources** (CSS, images, etc.) into a single self-contained HTML file
-3. **Optimise base64-encoded content** to reduce file size
+3. **Optimise base64-encoded content** (images and audio) to reduce file size
 4. **Convert PNG images to JPEG** for further size reduction
 
 ## Step-by-Step Process
@@ -50,22 +50,26 @@ This command:
 - Creates a self-contained HTML file with no external dependencies
 - The `--no-frames` option prevents the creation of frames
 
-### 3. Audio optimise Base64 Content
+### 3. Optimise Base64 Content (Images and Audio)
 
 ```bash
-python optimise_base64.py merged-embedded.html -q 25
+python optimise_base64_image_audio.py merged-embedded.html -i 75 -a 32 -w -v
 ```
 
 This script:
-- Processes the embedded HTML file to optimise base64-encoded content
-- Optimises audio files
+- Processes the embedded HTML file to optimise all base64-encoded content
+- Optimises images with 75% quality and converts to WebP when beneficial
+- Optimises audio files with 32kbps bitrate
 - Uses more efficient encoding techniques
-- Outputs the optimised file as `merged-embedded-audio_optimised.html`
+- Provides verbose output with detailed statistics
+- Outputs the optimised file as `merged-embedded-optimized.html`
+
+> **Note:** The older separate scripts `optimise_base64.py` (audio only) and `optimise_base64_former.py` (images only) are still available but the combined script is recommended.
 
 ### 4. Convert PNGs to JPEGs
 
 ```bash
-python png_to_jpeg_optimiser.py merged-embedded-audio_optimised.html -j 25 -e iVBORw0KGgoAAAANSUhEUgAABG iVBORw0KGgoAAAANSUhEUgAACO
+python png_to_jpeg_optimiser.py merged-embedded-optimized.html -j 25 -e iVBORw0KGgoAAAANSUhEUgAABG iVBORw0KGgoAAAANSUhEUgAACO iVBORw0KGgoAAAANSUhEUgAAAC iVBORw0KGgoAAAANSUhEUgAAAY
 ```
 
 This script:
@@ -87,31 +91,65 @@ Merges multiple HTML files exported from Adobe InDesign into a single scrollable
 - Preserves original content and styling
 - Adds JavaScript for smooth scrolling between sections
 
-### optimise_base64.py
+### optimise_base64_image_audio.py
 
-Optimises base64-encoded content in HTML files, focusing on reducing the size of embedded media.
+Optimises all base64-encoded content in HTML files, combining image and audio optimization in a single script.
 
 **Features:**
-- Reduces image quality while maintaining acceptable visual appearance
-- Converts images to WebP format when beneficial
-- Optimises SVG files with text-based minification
-- Can use Base85 encoding instead of Base64 for better compression
+- Optimizes JPG/PNG images by reducing quality and converting to WebP when beneficial
+- Handles SVG files with text-based optimization
+- Optimizes audio files by reducing bitrate while maintaining compatibility
+- Uses Base85 encoding for images (more efficient than Base64)
+- Maintains Base64 encoding for audio files to ensure compatibility
 - Adds client-side JavaScript for handling optimised content
-- Optimises audio files by reducing bitrate (requires FFmpeg)
+- Provides detailed statistics for both image and audio optimization
 
 **Options:**
-- `-b/--bitrate`: Audio bitrate in kbps (default: 128) - requires FFmpeg to be installed
+- `-i/--image-quality`: Image quality (1-100, default: 80)
+- `-a/--audio-bitrate`: Audio bitrate in kbps (default: 128) - requires FFmpeg
+- `-w/--webp`: Convert images to WebP format when beneficial
 - `-d/--max-dimension`: Maximum image dimension for resizing
 - `-m/--min-size`: Minimum size to consider for optimisation
 - `-r/--min-ratio`: Minimum compression ratio to apply changes
-- `-85/--base85`: Use Base85 encoding
+- `-85/--base85`: Use Base85 encoding for images
 - `-c/--chunks`: Process file in chunks (for very large files)
+- `-v/--verbose`: Print detailed output for debugging
+
+**Example Use Case:**
+```bash
+python optimise_base64_image_audio.py merged-embedded.html -i 75 -a 32 -w -v
+```
+This command will:
+- Process `merged-embedded.html` and create `merged-embedded-optimized.html`
+- Optimize images with 75% quality and convert to WebP when beneficial
+- Optimize audio files with 32kbps bitrate
+- Print verbose output with detailed statistics
+
+**Requirements:**
+1. For image optimization: Pillow library must be installed
+2. For audio optimization: FFmpeg must be installed and available in the PATH
+3. The HTML must contain elements with base64-encoded data URIs
+4. The optimized content must be at least 5% smaller than the original (configurable with `-r` option)
+
+### optimise_base64.py (Legacy - Audio Only)
+
+Optimises base64-encoded audio content in HTML files.
+
+**Features:**
+- Optimises audio files by reducing bitrate (requires FFmpeg)
+- Adds client-side JavaScript for handling optimised content
+
+**Options:**
+- `-b/--bitrate`: Audio bitrate in kbps (default: 128) - requires FFmpeg to be installed
+- `-m/--min-size`: Minimum size to consider for optimisation
+- `-c/--chunks`: Process file in chunks (for very large files)
+- `-v/--verbose`: Print verbose output for debugging
 
 **Note on Audio Optimisation:**
 The audio bitrate optimisation has several requirements to work properly:
 1. FFmpeg must be installed on your system and available in the PATH
 2. The HTML must contain audio elements with base64-encoded data URIs
-3. The optimised audio must be at least 5% smaller than the original (configurable with `-r` option)
+3. The optimised audio must be at least 5% smaller than the original
 4. The audio content must have a MIME type that starts with 'audio/'
 
 ### png_to_jpeg_optimiser.py
