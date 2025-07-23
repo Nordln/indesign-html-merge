@@ -1,14 +1,9 @@
-#!/usr/bin/env python3
-"""
-Script to optimize base64 encoded content in HTML files.
-Specialized for JPG/PNG images, SVG, and audio files.
+#!/usr/bin/env python
 
-This enhanced version:
-1. Optimizes JPG/PNG images by reducing quality and converting to WebP when beneficial
-2. Handles SVG files appropriately with text-based optimization
-3. Optimizes audio files by reducing bitrate while maintaining compatibility
-4. Uses a more efficient Base85 encoding instead of Base64 when possible (except for audio)
-5. Provides options for both image quality and audio bitrate
+"""optimise_base64_image_audio.py: Script to optimize base64 encoded content in HTML files. Specialized for JPG/PNG images, SVG, and audio files."""
+
+__author__      = "Ed Watson"
+__copyright__   = "Unlicense license"
 """
 
 import os
