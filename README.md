@@ -4,7 +4,7 @@ This repository contains a set of Python scripts designed to prepare and optimis
 
 ## Use Case
 
-This workflow is designed for preparing Adobe InDesign HTML exports for web publication. The process significantly reduces file size while maintaining content quality, making it suitable for sharing interactive learning content for consumpion from the general public. By following this optimisation workflow, the designer can convert multiple large HTML exports into a single, optimised file suitable for web hosting and distribution.
+This workflow is designed for preparing Adobe InDesign HTML exports for web publication. The process significantly reduces file size while maintaining content quality, making it suitable for sharing interactive learning content for consumpsion from the general public. By following this workflow, the ID5 designer can convert multiple large HTML exports into a single, optimised file suitable for web hosting and distribution.
 
 ## Prerequisites
 
