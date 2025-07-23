@@ -4,7 +4,6 @@
 
 __author__      = "Ed Watson"
 __copyright__   = "Unlicense license"
-"""
 
 import os
 import re
