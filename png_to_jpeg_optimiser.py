@@ -1,13 +1,10 @@
-#!/usr/bin/env python3
-"""
-Script to optimize base64 encoded content in HTML files with PNG to JPEG conversion.
-This script:
-1. Finds data URIs with base64 encoded content
-2. Converts PNG images to medium-quality JPEG (except excluded ones)
-3. Re-encodes the optimized content to base64
-4. Replaces the original data URI with the optimized version
+#!/usr/bin/env python
 
-This version allows for longer exclusion prefixes (26 characters) for more precise control.
+"""png_to_jpeg_optimiser.py: Script to optimize base64 encoded content in HTML files with PNG to JPEG conversion."""
+
+__author__      = "Ed Watson"
+__copyright__   = "Unlicense license"
+"""
 """
 
 import os
