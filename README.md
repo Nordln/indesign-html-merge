@@ -67,7 +67,7 @@ This script:
 
 > **Note:** The older separate scripts `optimise_base64.py` (audio only) and `optimise_base64_former.py` (images only) are still available but the combined script is recommended.
 
-### 4. Convert PNGs to JPEGs
+### 4. [Optional] Convert PNGs to JPEGs
 
 ```bash
 python png_to_jpeg_optimiser.py merged-embedded-optimized.html -j 25 -e iVBORw0KGgoAAAANSUhEUgAABG iVBORw0KGgoAAAANSUhEUgAACO iVBORw0KGgoAAAANSUhEUgAAAC iVBORw0KGgoAAAANSUhEUgAAAY
