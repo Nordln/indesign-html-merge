@@ -5,7 +5,7 @@ This repository contains a set of scripts designed to prepare and optimise HTML 
 ## Use Case
 
 This workflow is designed for preparing Adobe InDesign HTML exports for web publication. The process significantly reduces file size while maintaining content quality, making it suitable for sharing interactive learning content for consumpsion from the general public. This workflow mimics some of the function of ajarproduction's In5 indesign plugin. Example input and output files are provided.
-
+![alt text](EXAMPLE_10page.gif)
 
 ## Prerequisites
 
