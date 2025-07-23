@@ -4,7 +4,7 @@ This repository contains a set of scripts designed to prepare and optimise HTML 
 
 ## Use Case
 
-This workflow is designed for preparing Adobe InDesign HTML exports for web publication. The process significantly reduces file size while maintaining content quality, making it suitable for sharing interactive learning content for consumpsion from the general public. By following this workflow, the designer can convert multiple large HTML exports into a single, optimised file suitable for web hosting and distribution. Connectively, this workflow mimics some of the function of ajarproduction's In5 indesign plugin. An example output is provided.
+This workflow is designed for preparing Adobe InDesign HTML exports for web publication. The process significantly reduces file size while maintaining content quality, making it suitable for sharing interactive learning content for consumpsion from the general public. This workflow mimics some of the function of ajarproduction's In5 indesign plugin. An example output is provided.
 
 ## Prerequisites
 
