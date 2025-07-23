@@ -1,3 +1,10 @@
+#!/usr/bin/env python
+
+"""merge_all_publications.py: Merges multiple HTML files exported from Adobe InDesign into a single scrollable document with navigation between pages."""
+
+__author__      = "Ed Watson"
+__copyright__   = "Unlicense license"
+
 import os
 import re
 from bs4 import BeautifulSoup
