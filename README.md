@@ -25,7 +25,7 @@ The optimisation process consists of four sequential steps:
 4. **Convert PNG images to JPEG** for further size reduction
 
 ## Step-by-Step Process
-This workflow assumes you have created a multipage interactive design using Adobe Indesign, and have used the ``file -> export -> HTML5`` export option. These scripts are intended to be run from ``publication-web-resources/html`` folder of the export. It is important that the files in the parent folders are present, since they are heavily referened in the html files.
+This workflow assumes you have created a multipage interactive design using Adobe Indesign, and have used the ``file -> export -> HTML5`` export option. These scripts are intended to be run from ``publication-web-resources/html/`` folder of the export, where the publication*.html files are placed. It is important that the files in the parent folders are present, since they are heavily referened in the html files. The first html page needs to renamed from ``publication.html`` to ``publication-0.html`` to be visable to the merge script.
 
 ### 1. Merge Publications
 
