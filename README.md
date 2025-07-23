@@ -69,8 +69,6 @@ This script:
 - Provides verbose output with detailed statistics
 - Outputs the optimised file as `merged-embedded-optimized.html`
 
-> **Note:** The older separate scripts `optimise_base64.py` (audio only) and `optimise_base64_former.py` (images only) are still available but the combined script is recommended.
-
 ### 4. [Optional] Convert PNGs to JPEGs
 
 ```bash
