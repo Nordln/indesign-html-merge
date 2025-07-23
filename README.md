@@ -132,27 +132,6 @@ This command will:
 3. The HTML must contain elements with base64-encoded data URIs
 4. The optimized content must be at least 5% smaller than the original (configurable with `-r` option)
 
-### optimise_base64.py (Legacy - Audio Only)
-
-Optimises base64-encoded audio content in HTML files.
-
-**Features:**
-- Optimises audio files by reducing bitrate (requires FFmpeg)
-- Adds client-side JavaScript for handling optimised content
-
-**Options:**
-- `-b/--bitrate`: Audio bitrate in kbps (default: 128) - requires FFmpeg to be installed
-- `-m/--min-size`: Minimum size to consider for optimisation
-- `-c/--chunks`: Process file in chunks (for very large files)
-- `-v/--verbose`: Print verbose output for debugging
-
-**Note on Audio Optimisation:**
-The audio bitrate optimisation has several requirements to work properly:
-1. FFmpeg must be installed on your system and available in the PATH
-2. The HTML must contain audio elements with base64-encoded data URIs
-3. The optimised audio must be at least 5% smaller than the original
-4. The audio content must have a MIME type that starts with 'audio/'
-
 ### png_to_jpeg_optimiser.py
 
 Specifically focuses on converting PNG images to JPEG format for further size reduction.
