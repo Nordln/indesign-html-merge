@@ -1,6 +1,6 @@
 # Indesign HTML5 Merging and Optimisation Workflow
 
-This repository contains a set of Python scripts designed to prepare and optimise HTML files exported from Adobe InDesign for web publication. The workflow processes raw HTML exports, merges them into a single file, and applies various optimisation techniques to reduce file size while maintaining quality.
+This repository contains a set of Python scripts designed to prepare and optimise HTML files exported from Adobe InDesign for web publication. The workflow processes raw HTML exports, merges them into a single file, and applies various optimisation techniques to reduce file size while maintaining quality. Connectively, this workflow mimics some of the function of ajarproduction's In5 indesign plugin. 
 
 ## Use Case
 
@@ -25,6 +25,7 @@ The optimisation process consists of four sequential steps:
 4. **Convert PNG images to JPEG** for further size reduction
 
 ## Step-by-Step Process
+This workflow assumes you have created a multipage interactive design using Adobe Indesign, and have used the ``file -> export -> HTML5`` export option. These scripts are intended to be run from ``publication-web-resources/html`` folder of the export. It is important that the files in the parent folders are present, since they are heavily referened in the html files.
 
 ### 1. Merge Publications
 
