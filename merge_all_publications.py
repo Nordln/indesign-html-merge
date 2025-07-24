@@ -54,7 +54,7 @@ def merge_html_pages(publication_files, output_path):
 <html xmlns="http://www.w3.org/1999/xhtml" lang="de-DE">
 <head>
     <meta charset="utf-8" />
-    <title>Merged Publications</title>
+    <title>HTML5 Publication</title>
     <link href="../css/idGeneratedStyles.css" rel="stylesheet" type="text/css" />
     <script src="../script/idGeneratedScript.js" type="text/javascript"></script>
     <style>
