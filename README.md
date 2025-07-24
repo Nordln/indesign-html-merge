@@ -68,6 +68,8 @@ This script:
 - Uses more efficient encoding techniques
 - Provides verbose output with detailed statistics
 - Outputs the optimised file as `merged-embedded-optimized.html`
+- Generally results in a 50% reduction in filesize as a result of base64 data block zip compression and audio downsampling
+- Injests JS in the output html that uncompresses the data blocks after the document loads
 
 ### 4. [Optional] Convert PNGs to JPEGs
 
