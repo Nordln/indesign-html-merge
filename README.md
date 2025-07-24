@@ -4,7 +4,7 @@ This repository contains a set of scripts designed to prepare and optimise HTML 
 
 ## Use Case
 
-This workflow is designed for preparing Adobe InDesign HTML exports for web publication. The process significantly reduces file size while maintaining content quality, making it suitable for sharing interactive learning content for consumpsion from the general public. This workflow mimics some of the function of ajarproduction's In5 indesign plugin. Example input and output files are provided. A gif is below.  
+This workflow is designed for preparing Adobe InDesign HTML exports for web publication. The process significantly reduces file size while maintaining content quality, making it suitable for sharing interactive learning content for consumpsion from the general public. This workflow mimics some of the function of ajarproduction's In5 indesign plugin. Example input and output files are provided. A gif is below. You can view the HTML as an interactive website i.e. in the proper MIME format, via [this link](https://raw.githack.com/Nordln/indesign-html-merge/refs/heads/main/EXAMPLE_merged-embedded-optimised.html).
    
 <table><tr><td>
 <img src="EXAMPLE_10page.gif" width="500">
