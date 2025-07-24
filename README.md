@@ -1,6 +1,6 @@
 # Indesign HTML5 Merging and Optimisation Workflow
 
-This repository contains a set of scripts designed to prepare and optimise HTML files exported from Adobe InDesign for single-asset web publication.
+This repository contains a set of scripts designed to prepare and optimise HTML files exported from Adobe InDesign for single-asset web publication for present use and future archival.
 
 ## Use Case
 
