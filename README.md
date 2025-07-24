@@ -67,14 +67,14 @@ This script:
 - Optimises audio files with 32kbps bitrate
 - Uses more efficient encoding techniques
 - Provides verbose output with detailed statistics
-- Outputs the optimised file as `merged-embedded-optimized.html`
+- Outputs the optimised file as `merged-embedded-optimised.html`
 - Generally results in a 50% reduction in filesize as a result of base64 data block zip compression and audio downsampling
 - Injects JS in the output html that uncompresses the data blocks after the document loads
 
 ### 4. [Optional] Convert PNGs to JPEGs
 
 ```bash
-python png_to_jpeg_optimiser.py merged-embedded-optimized.html -j 25 -e iVBORw0KGgoAAAANSUhEUgAABG iVBORw0KGgoAAAANSUhEUgAACO iVBORw0KGgoAAAANSUhEUgAAAC iVBORw0KGgoAAAANSUhEUgAAAY
+python png_to_jpeg_optimiser.py merged-embedded-optimised.html -j 25 -e iVBORw0KGgoAAAANSUhEUgAABG iVBORw0KGgoAAAANSUhEUgAACO iVBORw0KGgoAAAANSUhEUgAAAC iVBORw0KGgoAAAANSUhEUgAAAY
 ```
 
 This script:
@@ -98,16 +98,16 @@ Merges multiple HTML files exported from Adobe InDesign into a single scrollable
 
 ### optimise_base64_image_audio.py
 
-Optimises all base64-encoded content in HTML files, combining image and audio optimization in a single script.
+Optimises all base64-encoded content in HTML files, combining image and audio optimisation in a single script.
 
 **Features:**
-- Optimizes JPG/PNG images by reducing quality and converting to WebP when beneficial
-- Handles SVG files with text-based optimization
-- Optimizes audio files by reducing bitrate while maintaining compatibility
+- Optimises JPG/PNG images by reducing quality and converting to WebP when beneficial
+- Handles SVG files with text-based optimisation
+- Optimises audio files by reducing bitrate while maintaining compatibility
 - Uses Base85 encoding for images (more efficient than Base64)
 - Maintains Base64 encoding for audio files to ensure compatibility
 - Adds client-side JavaScript for handling optimised content
-- Provides detailed statistics for both image and audio optimization
+- Provides detailed statistics for both image and audio optimisation
 
 **Options:**
 - `-i/--image-quality`: Image quality (1-100, default: 80)
@@ -125,16 +125,16 @@ Optimises all base64-encoded content in HTML files, combining image and audio op
 python optimise_base64_image_audio.py merged-embedded.html -i 75 -a 32 -w -v
 ```
 This command will:
-- Process `merged-embedded.html` and create `merged-embedded-optimized.html`
-- Optimize images with 75% quality and convert to WebP when beneficial
-- Optimize audio files with 32kbps bitrate
+- Process `merged-embedded.html` and create `merged-embedded-optimised.html`
+- Optimise images with 75% quality and convert to WebP when beneficial
+- Optimise audio files with 32kbps bitrate
 - Print verbose output with detailed statistics
 
 **Requirements:**
-1. For image optimization: Pillow library must be installed
-2. For audio optimization: FFmpeg must be installed and available in the PATH
+1. For image optimisation: Pillow library must be installed
+2. For audio optimisation: FFmpeg must be installed and available in the PATH
 3. The HTML must contain elements with base64-encoded data URIs
-4. The optimized content must be at least 5% smaller than the original (configurable with `-r` option)
+4. The optimised content must be at least 5% smaller than the original (configurable with `-r` option)
 
 ### png_to_jpeg_optimiser.py
 
