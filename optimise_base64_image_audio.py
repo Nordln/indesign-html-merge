@@ -148,6 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Set the appropriate attribute based on element type
                 if (element.tagName === 'IMG') {
+                    // For img tags, always set the src attribute (required by HTML5)
                     element.src = dataUri;
                 } else if (element.tagName === 'SOURCE') {
                     element.srcset = dataUri;
@@ -727,7 +728,11 @@ def process_data_uri(match, tag_name=None, options=None):
         
         # For img, audio, and source tags, replace with data-optimized attributes
         if tag_name in ['img', 'source', 'audio']:
-            return f'data-optimized-src="{encoded_data}" data-mime-type="{new_mime_type}" data-encoding="{encoding}" data-compression="{compression}"'
+            # For img tags, ensure we keep an empty src attribute to satisfy HTML5 validation
+            if tag_name == 'img':
+                return f'src="" data-optimized-src="{encoded_data}" data-mime-type="{new_mime_type}" data-encoding="{encoding}" data-compression="{compression}"'
+            else:
+                return f'data-optimized-src="{encoded_data}" data-mime-type="{new_mime_type}" data-encoding="{encoding}" data-compression="{compression}"'
         
         # For CSS background images or other contexts
         return f'data-optimized-src="{encoded_data}" data-mime-type="{new_mime_type}" data-encoding="{encoding}" data-compression="{compression}"'
@@ -756,7 +761,11 @@ def optimize_html_file(input_path, output_path, options=None, inflate_js_content
         # Process img tags with src attributes
         img_pattern = r'<img[^>]+src=["\'](data:[^;]+;base64,[^"\']+)["\'][^>]*>'
         html_content = re.sub(img_pattern, lambda m: re.sub(r'src=["\'](data:[^;]+;base64,[^"\']+)["\']',
-                                                          lambda n: process_data_uri(n, 'img', options), m.group(0)), html_content)
+                                                           lambda n: process_data_uri(n, 'img', options), m.group(0)), html_content)
+        
+        # Ensure all img tags with data-optimized-src also have an empty src attribute if missing
+        html_content = re.sub(r'<img([^>]*)data-optimized-src="([^"]+)"([^>]*)(?!src=)([^>]*)>',
+                             r'<img\1data-optimized-src="\2"\3 src=""\4>', html_content)
         
         # Process source tags with srcset attributes (for images)
         source_srcset_pattern = r'<source[^>]+srcset=["\'](data:[^;]+;base64,[^"\']+)["\'][^>]*>'
@@ -859,7 +868,11 @@ def process_chunk(chunk, options=None):
     # Process img tags with src attributes
     img_pattern = r'<img[^>]+src=["\'](data:[^;]+;base64,[^"\']+)["\'][^>]*>'
     chunk = re.sub(img_pattern, lambda m: re.sub(r'src=["\'](data:[^;]+;base64,[^"\']+)["\']',
-                                                lambda n: process_data_uri(n, 'img', options), m.group(0)), chunk)
+                                                 lambda n: process_data_uri(n, 'img', options), m.group(0)), chunk)
+    
+    # Ensure all img tags with data-optimized-src also have an empty src attribute if missing
+    chunk = re.sub(r'<img([^>]*)data-optimized-src="([^"]+)"([^>]*)(?!src=)([^>]*)>',
+                  r'<img\1data-optimized-src="\2"\3 src=""\4>', chunk)
     
     # Process source tags with srcset attributes (for images)
     source_srcset_pattern = r'<source[^>]+srcset=["\'](data:[^;]+;base64,[^"\']+)["\'][^>]*>'
@@ -902,8 +915,10 @@ def process_file_in_chunks(input_path, output_path, chunk_size=10*1024*1024, opt
             decoder_js_end = DECODER_JS.split("{inflate_js_content}")[1]
             complete_decoder_js = decoder_js_start + inflate_js_content + decoder_js_end
             
-            # Add decoder JavaScript at the beginning
+            # Add decoder JavaScript at the beginning with proper HTML structure
             outfile.write('<!DOCTYPE html>\n<html>\n<head>\n')
+            outfile.write('<meta charset="UTF-8">\n')
+            outfile.write('<title>Optimized Content</title>\n')
             outfile.write(complete_decoder_js)
             outfile.write('\n</head>\n<body>\n')
             
