@@ -16,8 +16,9 @@ This workflow is designed for preparing Adobe InDesign HTML exports for web publ
 - Required Python packages (install via `pip install -r requirements.txt`):
   - BeautifulSoup4
   - Pillow (PIL)
-- External tool:
+- External tools:
   - [Monolith](https://github.com/Y2Z/monolith) - A command-line tool for saving web pages as a single HTML file
+  - [FFmpeg](https://ffmpeg.org/download.html) - A command-line tool for converting media files into different formats and bitrates
 
 ## Workflow Overview
 
