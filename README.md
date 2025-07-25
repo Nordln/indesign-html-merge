@@ -17,8 +17,8 @@ This workflow is designed for preparing Adobe InDesign HTML exports for web publ
   - BeautifulSoup4
   - Pillow (PIL)
 - External tools:
-  - [Monolith](https://github.com/Y2Z/monolith) - A command-line tool for saving web pages as a single HTML file
-  - [FFmpeg](https://ffmpeg.org/download.html) - A command-line tool for converting media files into different formats and bitrates
+  - [Monolith](https://github.com/Y2Z/monolith) v2.10.1 or higher - A command-line tool for saving web pages as a single HTML file
+  - [FFmpeg](https://ffmpeg.org/download.html) v5.1.6 or higher - A command-line tool for converting media files into different formats and bitrates
 
 ## Workflow Overview
 
