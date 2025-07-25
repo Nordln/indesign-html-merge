@@ -27,7 +27,7 @@ The optimisation process consists of four sequential steps:
 1. **Merge multiple HTML files** into a single scrollable document
 2. **Embed all resources** (CSS, images, etc.) into a single self-contained HTML file
 3. **Optimise base64-encoded content** (images and audio) to reduce file size
-4. **Convert PNG images to JPEG** for further size reduction
+4. **Optionally, convert PNG images to JPEG** for further size reduction
 
 ## Step-by-Step Process
 This workflow assumes you have created a multipage interactive design using Adobe Indesign, and have used the ``file -> export -> HTML5`` export option. These scripts are intended to be run from ``publication-web-resources/html/`` folder of the export, where the publication*.html files are placed. It is important that the files in the parent folders are present, since they are heavily referened in the html files. The first html page needs to be renamed from ``publication.html`` to ``publication-0.html`` to be visible to the merge script.
