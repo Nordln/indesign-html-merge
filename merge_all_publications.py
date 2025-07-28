@@ -3,7 +3,7 @@
 """merge_all_publications.py: Merges multiple HTML files exported from Adobe InDesign into a single scrollable document with navigation between pages."""
 
 __author__      = "Ed Watson"
-__copyright__   = "Unlicense license"
+__copyright__   = "CC-BY-SA-4.0 license"
 
 import os
 import re
