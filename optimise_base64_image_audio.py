@@ -3,7 +3,7 @@
 """optimise_base64_image_audio.py: Script to optimize base64 encoded content in HTML files. Specialized for JPG/PNG images, SVG, and audio files."""
 
 __author__      = "Ed Watson"
-__copyright__   = "Unlicense license"
+__copyright__   = "CC-BY-SA-4.0 license"
 
 import os
 import re
