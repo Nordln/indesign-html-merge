@@ -3,7 +3,7 @@
 """png_to_jpeg_optimiser.py: Script to optimize base64 encoded content in HTML files with PNG to JPEG conversion."""
 
 __author__      = "Ed Watson"
-__copyright__   = "Unlicense license"
+__copyright__   = "CC-BY-SA-4.0 license"
 
 import os
 import re
