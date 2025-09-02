@@ -119,6 +119,22 @@ def merge_html_pages(publication_files, output_path):
             text-align: center;
             font-size: 14px;
         }
+        .current-page-display {
+            margin-left: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+        .current-page-display {
+            margin-left: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
     </style>
     <script type="text/javascript">
         function scrollToPage(userPageNumber) {
@@ -226,6 +242,9 @@ def merge_html_pages(publication_files, output_path):
                         <button class="nav-button" onclick="{goto_onclick}">Go</button>
                     </div>
                     <button class="nav-button" {next_disabled} onclick="{next_onclick}">Next Page</button>
+                    <div class="current-page-display">
+                        Page {display_page_number} of {total_pages}
+                    </div>
                 </div>
 '''
     
