@@ -151,6 +151,10 @@ def merge_html_pages(publication_files, output_path):
         }
         
         /* Print media queries */
+        @page {
+            size: landscape;
+        }
+        
         @media print {
             /* Hide navigation elements */
             .separator, .nav-button, .goto-container, .current-page-display, .print-container {
