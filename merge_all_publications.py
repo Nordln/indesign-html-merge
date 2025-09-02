@@ -61,7 +61,7 @@ def merge_html_pages(publication_files, output_path):
         body {
             margin: 0;
             padding: 0;
-            background-color: white;
+            background-color: black;
         }
         .container {
             width: 840px;
