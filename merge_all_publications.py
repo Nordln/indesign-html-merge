@@ -135,6 +135,55 @@ def merge_html_pages(publication_files, output_path):
             display: flex;
             align-items: center;
         }
+        .print-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 15px;
+        }
+        .print-button {
+            background-color: #28a745;
+            font-size: 12px;
+            padding: 6px 12px;
+        }
+        .print-button:hover {
+            background-color: #218838;
+        }
+        .print-select {
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 12px;
+            background-color: white;
+        }
+        
+        /* Print media queries */
+        @media print {
+            .separator, .nav-button, .goto-container, .current-page-display, .print-container {
+                display: none !important;
+            }
+            
+            .publication {
+                page-break-after: always;
+                margin: 0;
+                width: 100% !important;
+                height: auto !important;
+            }
+            
+            /* Hide all pages by default */
+            .publication {
+                display: none !important;
+            }
+            
+            /* Show only the page marked for printing */
+            .publication.print-active {
+                display: block !important;
+            }
+            
+            body {
+                background-color: white !important;
+            }
+        }
     </style>
     <script type="text/javascript">
         function scrollToPage(userPageNumber) {
@@ -184,11 +233,80 @@ def merge_html_pages(publication_files, output_path):
             input.value = '';
         }
         
+        function printCurrentPage() {
+            // Get the currently visible page
+            const currentPageNumber = getCurrentVisiblePage();
+            printSpecificPage(currentPageNumber);
+        }
+
+        function printSpecificPage(pageNumber) {
+            // Remove print-active class from all pages
+            document.querySelectorAll('.publication').forEach(pub => {
+                pub.classList.remove('print-active');
+            });
+            
+            // Add print-active class to the target page
+            const targetPage = document.getElementById('publication-' + (pageNumber - 1));
+            if (targetPage) {
+                targetPage.classList.add('print-active');
+                
+                // Trigger print dialog
+                window.print();
+                
+                // Clean up after print dialog closes
+                setTimeout(() => {
+                    targetPage.classList.remove('print-active');
+                }, 1000);
+            }
+        }
+
+        function getCurrentVisiblePage() {
+            // Find which page is currently most visible in viewport
+            const publications = document.querySelectorAll('.publication');
+            let mostVisiblePage = 1;
+            let maxVisibleArea = 0;
+            
+            publications.forEach((pub, index) => {
+                const rect = pub.getBoundingClientRect();
+                const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+                const visibleArea = Math.max(0, visibleHeight) * rect.width;
+                
+                if (visibleArea > maxVisibleArea) {
+                    maxVisibleArea = visibleArea;
+                    mostVisiblePage = index + 1; // Convert to 1-based
+                }
+            });
+            
+            return mostVisiblePage;
+        }
+
+        function initializePrintDropdowns() {
+            const totalPages = document.querySelectorAll('.publication').length;
+            const selects = document.querySelectorAll('.print-select');
+            
+            selects.forEach(select => {
+                select.innerHTML = '';
+                for (let i = 1; i <= totalPages; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = `Page ${i}`;
+                    select.appendChild(option);
+                }
+            });
+        }
+
+        function printSelectedPage(sectionNumber) {
+            const select = document.getElementById(`print-page-select-${sectionNumber}`);
+            const selectedPage = parseInt(select.value);
+            printSpecificPage(selectedPage);
+        }
+        
         // Register interactive handlers from original script and add our navigation
         function initializeNavigation() {
             if (typeof RegisterInteractiveHandlers === 'function') {
                 RegisterInteractiveHandlers();
             }
+            initializePrintDropdowns();
         }
     </script>
 </head>
@@ -242,6 +360,12 @@ def merge_html_pages(publication_files, output_path):
                         <button class="nav-button" onclick="{goto_onclick}">Go</button>
                     </div>
                     <button class="nav-button" {next_disabled} onclick="{next_onclick}">Next Page</button>
+                    <div class="print-container">
+                        <button class="nav-button print-button" onclick="printCurrentPage()">Print Current Page</button>
+                        <select class="print-select" id="print-page-select-{display_page_number}">
+                        </select>
+                        <button class="nav-button print-button" onclick="printSelectedPage({display_page_number})">Print Selected</button>
+                    </div>
                     <div class="current-page-display">
                         Page {display_page_number} of {total_pages}
                     </div>
