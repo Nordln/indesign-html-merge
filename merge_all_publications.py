@@ -121,8 +121,10 @@ def merge_html_pages(publication_files, output_path):
         }
     </style>
     <script type="text/javascript">
-        function scrollToPage(pageId) {
-            const element = document.getElementById(pageId);
+        function scrollToPage(userPageNumber) {
+            // Convert 1-based user page number to 0-based div ID
+            const divId = 'publication-' + (userPageNumber - 1);
+            const element = document.getElementById(divId);
             if (element) {
                 // Get the element's position relative to the viewport
                 const rect = element.getBoundingClientRect();
@@ -141,14 +143,14 @@ def merge_html_pages(publication_files, output_path):
         function navigateToPreviousPage(currentPageNumber) {
             const prevPageNumber = currentPageNumber - 1;
             if (prevPageNumber >= 1) {
-                scrollToPage('publication-' + prevPageNumber);
+                scrollToPage(prevPageNumber);
             }
         }
         
         function navigateToNextPage(currentPageNumber, totalPages) {
             const nextPageNumber = currentPageNumber + 1;
             if (nextPageNumber <= totalPages) {
-                scrollToPage('publication-' + nextPageNumber);
+                scrollToPage(nextPageNumber);
             }
         }
         
@@ -162,7 +164,7 @@ def merge_html_pages(publication_files, output_path):
                 return;
             }
             
-            scrollToPage('publication-' + pageNumber);
+            scrollToPage(pageNumber);
             input.value = '';
         }
         
@@ -180,8 +182,11 @@ def merge_html_pages(publication_files, output_path):
     
     # Process each publication file
     for index, file_path in enumerate(publication_files, 1):
-        # Extract page number from filename for the ID
-        page_number = os.path.basename(file_path).split('-')[1].split('.')[0]
+        # Extract page number from filename for the ID (0-based from filename)
+        file_page_number = os.path.basename(file_path).split('-')[1].split('.')[0]
+        
+        # Use 1-based page numbering for user display
+        display_page_number = index
         
         # Read the HTML file
         with open(file_path, 'r', encoding='utf-8') as file:
@@ -192,25 +197,25 @@ def merge_html_pages(publication_files, output_path):
         main_content = soup.select_one('div[style*="position:absolute;overflow:hidden"]')
         
         if main_content:
-            merged_html += f'<div class="publication" id="publication-{page_number}">\n'
+            # Keep div ID matching the original filename (0-based)
+            merged_html += f'<div class="publication" id="publication-{file_page_number}">\n'
             merged_html += str(main_content)
             merged_html += '\n</div>\n'
             
             # Add navigation buttons between publications (except after the last one)
             if index < len(publication_files):
-                current_page_num = int(page_number)
                 total_pages = len(publication_files)
                 
-                # Previous page button
-                prev_disabled = 'disabled' if current_page_num == 1 else ''
-                prev_onclick = f"navigateToPreviousPage({current_page_num})" if current_page_num > 1 else ""
+                # Previous page button (using 1-based display numbering)
+                prev_disabled = 'disabled' if display_page_number == 1 else ''
+                prev_onclick = f"navigateToPreviousPage({display_page_number})" if display_page_number > 1 else ""
                 
-                # Next page button
-                next_disabled = 'disabled' if current_page_num == total_pages else ''
-                next_onclick = f"navigateToNextPage({current_page_num}, {total_pages})" if current_page_num < total_pages else ""
+                # Next page button (using 1-based display numbering)
+                next_disabled = 'disabled' if display_page_number == total_pages else ''
+                next_onclick = f"navigateToNextPage({display_page_number}, {total_pages})" if display_page_number < total_pages else ""
                 
                 # Go to page input
-                input_id = f"goto-input-{current_page_num}"
+                input_id = f"goto-input-{display_page_number}"
                 goto_onclick = f"goToSpecificPage('{input_id}', {total_pages})"
                 
                 merged_html += f'''<div class="separator">
