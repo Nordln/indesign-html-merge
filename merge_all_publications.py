@@ -61,39 +61,70 @@ def merge_html_pages(publication_files, output_path):
         body {
             margin: 0;
             padding: 0;
-            background-color: white;
+            background-color: black;
         }
         .container {
-            width: 800px;
+            width: 840px;
             margin: 0 auto;
             overflow-y: auto;
         }
         .publication {
-            width: 800px;
+            width: 840px;
             height: 600px;
             position: relative;
             margin-bottom: 20px;
         }
         .separator {
-            height: 40px;
+            height: 30px;
             background-color: #f0f0f0;
             border-top: 1px solid #ccc;
             border-bottom: 1px solid #ccc;
             margin: 20px 0;
             text-align: center;
-            line-height: 40px;
             font-family: Arial, sans-serif;
-            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 10px;
+        }
+        .nav-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
             cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
             transition: background-color 0.3s;
         }
-        .separator:hover {
-            background-color: #e0e0e0;
+        .nav-button:hover {
+            background-color: #0056b3;
+        }
+        .nav-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .goto-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .goto-input {
+            width: 50px;
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 14px;
         }
     </style>
     <script type="text/javascript">
-        function scrollToPage(pageId) {
-            const element = document.getElementById(pageId);
+        function scrollToPage(userPageNumber) {
+            // Convert 1-based user page number to 0-based div ID
+            const divId = 'publication-' + (userPageNumber - 1);
+            const element = document.getElementById(divId);
             if (element) {
                 // Get the element's position relative to the viewport
                 const rect = element.getBoundingClientRect();
@@ -109,19 +140,38 @@ def merge_html_pages(publication_files, output_path):
             }
         }
         
+        function navigateToPreviousPage(currentPageNumber) {
+            const prevPageNumber = currentPageNumber - 1;
+            if (prevPageNumber >= 1) {
+                scrollToPage(prevPageNumber);
+            }
+        }
+        
+        function navigateToNextPage(currentPageNumber, totalPages) {
+            const nextPageNumber = currentPageNumber + 1;
+            if (nextPageNumber <= totalPages) {
+                scrollToPage(nextPageNumber);
+            }
+        }
+        
+        function goToSpecificPage(inputId, totalPages) {
+            const input = document.getElementById(inputId);
+            const pageNumber = parseInt(input.value);
+            
+            if (isNaN(pageNumber) || pageNumber < 1 || pageNumber > totalPages) {
+                alert('Please enter a valid page number between 1 and ' + totalPages);
+                input.value = '';
+                return;
+            }
+            
+            scrollToPage(pageNumber);
+            input.value = '';
+        }
+        
         // Register interactive handlers from original script and add our navigation
         function initializeNavigation() {
             if (typeof RegisterInteractiveHandlers === 'function') {
                 RegisterInteractiveHandlers();
-            }
-            
-            // Add click event listeners to all separator elements
-            const separators = document.getElementsByClassName('separator');
-            for (let i = 0; i < separators.length; i++) {
-                separators[i].addEventListener('click', function() {
-                    const nextPageId = this.getAttribute('data-target');
-                    scrollToPage(nextPageId);
-                });
             }
         }
     </script>
@@ -132,8 +182,11 @@ def merge_html_pages(publication_files, output_path):
     
     # Process each publication file
     for index, file_path in enumerate(publication_files, 1):
-        # Extract page number from filename for the ID
-        page_number = os.path.basename(file_path).split('-')[1].split('.')[0]
+        # Extract page number from filename for the ID (0-based from filename)
+        file_page_number = os.path.basename(file_path).split('-')[1].split('.')[0]
+        
+        # Use 1-based page numbering for user display
+        display_page_number = index
         
         # Read the HTML file
         with open(file_path, 'r', encoding='utf-8') as file:
@@ -144,15 +197,37 @@ def merge_html_pages(publication_files, output_path):
         main_content = soup.select_one('div[style*="position:absolute;overflow:hidden"]')
         
         if main_content:
-            merged_html += f'<div class="publication" id="publication-{page_number}">\n'
+            # Keep div ID matching the original filename (0-based)
+            merged_html += f'<div class="publication" id="publication-{file_page_number}">\n'
             merged_html += str(main_content)
             merged_html += '\n</div>\n'
             
-            # Add a clickable separator between publications (except after the last one)
+            # Add navigation buttons between publications (except after the last one)
             if index < len(publication_files):
-                next_page_number = int(page_number) + 1
-                next_page_id = f"publication-{next_page_number}"
-                merged_html += f'<div class="separator" data-target="{next_page_id}" onclick="scrollToPage(\'{next_page_id}\')">Continue to page {next_page_number}</div>\n'
+                total_pages = len(publication_files)
+                
+                # Previous page button (using 1-based display numbering)
+                prev_disabled = 'disabled' if display_page_number == 1 else ''
+                prev_onclick = f"navigateToPreviousPage({display_page_number})" if display_page_number > 1 else ""
+                
+                # Next page button (using 1-based display numbering)
+                next_disabled = 'disabled' if display_page_number == total_pages else ''
+                next_onclick = f"navigateToNextPage({display_page_number}, {total_pages})" if display_page_number < total_pages else ""
+                
+                # Go to page input
+                input_id = f"goto-input-{display_page_number}"
+                goto_onclick = f"goToSpecificPage('{input_id}', {total_pages})"
+                
+                merged_html += f'''<div class="separator">
+                    <button class="nav-button" {prev_disabled} onclick="{prev_onclick}">Previous Page</button>
+                    <div class="goto-container">
+                        <span>Go to page:</span>
+                        <input type="number" class="goto-input" id="{input_id}" min="1" max="{total_pages}" placeholder="1-{total_pages}">
+                        <button class="nav-button" onclick="{goto_onclick}">Go</button>
+                    </div>
+                    <button class="nav-button" {next_disabled} onclick="{next_onclick}">Next Page</button>
+                </div>
+'''
     
     # Close the container and body tags
     merged_html += """    </div>
