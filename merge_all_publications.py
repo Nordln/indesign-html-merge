@@ -183,21 +183,17 @@ def merge_html_pages(publication_files, output_path):
                 page-break-after: always;
             }
             
-            /* Show only the page marked for printing and scale to fill page */
+            /* Show only the page marked for printing with modest scaling */
             .publication.print-active {
                 display: block !important;
                 width: 100% !important;
-                height: 100vh !important;
-                transform: scale(1.2) !important;
-                transform-origin: top left !important;
+                height: auto !important;
+                transform: scale(1.15) !important;
+                transform-origin: top center !important;
                 margin: 0 !important;
                 padding: 0 !important;
-            }
-            
-            /* Scale the main content div within the publication */
-            .publication.print-active > div[style*="position:absolute"] {
-                transform: scale(1.4) !important;
-                transform-origin: top left !important;
+                overflow: hidden !important;
+                page-break-inside: avoid !important;
             }
             
             /* Hide only the specific InDesign interactive elements that should be hidden */
