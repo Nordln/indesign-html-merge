@@ -64,12 +64,12 @@ def merge_html_pages(publication_files, output_path):
             background-color: black;
         }
         .container {
-            width: 840px;
+            width: 843px;
             margin: 0 auto;
             overflow-y: auto;
         }
         .publication {
-            width: 840px;
+            width: 843px;
             height: 600px;
             position: relative;
             margin-bottom: 20px;
@@ -135,6 +135,70 @@ def merge_html_pages(publication_files, output_path):
             display: flex;
             align-items: center;
         }
+        .print-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 15px;
+        }
+        .print-button {
+            background-color: #28a745;
+            font-size: 12px;
+            padding: 6px 12px;
+        }
+        .print-button:hover {
+            background-color: #218838;
+        }
+        
+        /* Print media queries */
+        @page {
+            size: landscape;
+        }
+        
+        @media print {
+            /* Hide navigation elements */
+            .separator, .nav-button, .goto-container, .current-page-display, .print-container {
+                display: none !important;
+            }
+            
+            /* Reset body and container for print */
+            body {
+                background-color: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            .container {
+                width: 100% !important;
+                margin: 0 auto !important;
+                padding: 0 !important;
+                text-align: center !important;
+            }
+            
+            /* Hide all pages by default */
+            .publication {
+                display: none !important;
+                page-break-after: always;
+            }
+            
+            /* Show only the page marked for printing with simple scaling */
+            .publication.print-active {
+                display: block !important;
+                transform: scale(0.85) !important;
+                transform-origin: top center !important;
+                margin: 20px auto !important;
+            }
+            
+            /* Hide only the specific InDesign interactive elements that should be hidden */
+            ._idGenStateHide {
+                display: none !important;
+            }
+            
+            /* Hide audio controls */
+            audio {
+                display: none !important;
+            }
+        }
     </style>
     <script type="text/javascript">
         function scrollToPage(userPageNumber) {
@@ -183,6 +247,70 @@ def merge_html_pages(publication_files, output_path):
             scrollToPage(pageNumber);
             input.value = '';
         }
+        
+        function printCurrentPage() {
+            // Get the currently visible page
+            const currentPageNumber = getCurrentVisiblePage();
+            printSpecificPage(currentPageNumber);
+        }
+
+        function printSpecificPage(pageNumber) {
+            console.log('Printing page:', pageNumber);
+            
+            // Remove print-active class from all pages
+            document.querySelectorAll('.publication').forEach(pub => {
+                pub.classList.remove('print-active');
+            });
+            
+            // Add print-active class to the target page
+            const targetPageId = 'publication-' + (pageNumber - 1);
+            const targetPage = document.getElementById(targetPageId);
+            
+            console.log('Target page ID:', targetPageId);
+            console.log('Target page element:', targetPage);
+            
+            if (targetPage) {
+                targetPage.classList.add('print-active');
+                console.log('Added print-active class to:', targetPage);
+                
+                // Add a small delay to ensure CSS is applied
+                setTimeout(() => {
+                    // Trigger print dialog
+                    window.print();
+                    
+                    // Clean up after print dialog closes
+                    setTimeout(() => {
+                        targetPage.classList.remove('print-active');
+                        console.log('Removed print-active class');
+                    }, 1000);
+                }, 100);
+            } else {
+                console.error('Could not find page element with ID:', targetPageId);
+                alert('Could not find page to print. Available pages: ' +
+                      Array.from(document.querySelectorAll('.publication')).map(p => p.id).join(', '));
+            }
+        }
+
+        function getCurrentVisiblePage() {
+            // Find which page is currently most visible in viewport
+            const publications = document.querySelectorAll('.publication');
+            let mostVisiblePage = 1;
+            let maxVisibleArea = 0;
+            
+            publications.forEach((pub, index) => {
+                const rect = pub.getBoundingClientRect();
+                const visibleHeight = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0);
+                const visibleArea = Math.max(0, visibleHeight) * rect.width;
+                
+                if (visibleArea > maxVisibleArea) {
+                    maxVisibleArea = visibleArea;
+                    mostVisiblePage = index + 1; // Convert to 1-based
+                }
+            });
+            
+            return mostVisiblePage;
+        }
+
         
         // Register interactive handlers from original script and add our navigation
         function initializeNavigation() {
@@ -241,10 +369,13 @@ def merge_html_pages(publication_files, output_path):
                         <input type="number" class="goto-input" id="{input_id}" min="1" max="{total_pages}" placeholder="1-{total_pages}">
                         <button class="nav-button" onclick="{goto_onclick}">Go</button>
                     </div>
-                    <button class="nav-button" {next_disabled} onclick="{next_onclick}">Next Page</button>
+                    <div class="print-container">
+                        <button class="nav-button print-button" onclick="printCurrentPage()">Print Current Page</button>
+                    </div>
                     <div class="current-page-display">
                         Page {display_page_number} of {total_pages}
                     </div>
+                    <button class="nav-button" {next_disabled} onclick="{next_onclick}">Next Page</button>
                 </div>
 '''
     
