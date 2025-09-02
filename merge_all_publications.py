@@ -64,12 +64,12 @@ def merge_html_pages(publication_files, output_path):
             background-color: white;
         }
         .container {
-            width: 800px;
+            width: 820px;
             margin: 0 auto;
             overflow-y: auto;
         }
         .publication {
-            width: 800px;
+            width: 820px;
             height: 600px;
             position: relative;
             margin-bottom: 20px;
