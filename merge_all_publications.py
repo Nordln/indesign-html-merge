@@ -196,10 +196,27 @@ def merge_html_pages(publication_files, output_path):
                 opacity: 1 !important;
             }
             
-            /* Ensure content inside publication is visible */
-            .publication.print-active * {
+            /* Hide InDesign interactive elements that are hidden by default */
+            .publication.print-active ._idGenStateHide,
+            .publication.print-active [class*="_idGenButton"]._idGenStateHide,
+            .publication.print-active [style*="scale(0.05)"],
+            .publication.print-active [style*="transform: translate"][style*="scale(0.05)"],
+            .publication.print-active audio,
+            .publication.print-active [class*="_idGenObjectAttribute-3"] {
+                display: none !important;
+                visibility: hidden !important;
+            }
+            
+            /* Ensure visible content is properly displayed */
+            .publication.print-active > div:not(._idGenStateHide):not([class*="_idGenButton"]) {
                 visibility: visible !important;
                 opacity: 1 !important;
+            }
+            
+            /* Reset transforms for visible elements */
+            .publication.print-active div:not([style*="scale(0.05)"]) {
+                transform: none !important;
+                position: static !important;
             }
         }
     </style>
