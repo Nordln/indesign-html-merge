@@ -149,13 +149,6 @@ def merge_html_pages(publication_files, output_path):
         .print-button:hover {
             background-color: #218838;
         }
-        .print-select {
-            padding: 6px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 12px;
-            background-color: white;
-        }
         
         /* Print media queries */
         @media print {
@@ -314,33 +307,12 @@ def merge_html_pages(publication_files, output_path):
             return mostVisiblePage;
         }
 
-        function initializePrintDropdowns() {
-            const totalPages = document.querySelectorAll('.publication').length;
-            const selects = document.querySelectorAll('.print-select');
-            
-            selects.forEach(select => {
-                select.innerHTML = '';
-                for (let i = 1; i <= totalPages; i++) {
-                    const option = document.createElement('option');
-                    option.value = i;
-                    option.textContent = `Page ${i}`;
-                    select.appendChild(option);
-                }
-            });
-        }
-
-        function printSelectedPage(sectionNumber) {
-            const select = document.getElementById(`print-page-select-${sectionNumber}`);
-            const selectedPage = parseInt(select.value);
-            printSpecificPage(selectedPage);
-        }
         
         // Register interactive handlers from original script and add our navigation
         function initializeNavigation() {
             if (typeof RegisterInteractiveHandlers === 'function') {
                 RegisterInteractiveHandlers();
             }
-            initializePrintDropdowns();
         }
     </script>
 </head>
@@ -396,9 +368,6 @@ def merge_html_pages(publication_files, output_path):
                     <button class="nav-button" {next_disabled} onclick="{next_onclick}">Next Page</button>
                     <div class="print-container">
                         <button class="nav-button print-button" onclick="printCurrentPage()">Print Current Page</button>
-                        <select class="print-select" id="print-page-select-{display_page_number}">
-                        </select>
-                        <button class="nav-button print-button" onclick="printSelectedPage({display_page_number})">Print Selected</button>
                     </div>
                     <div class="current-page-display">
                         Page {display_page_number} of {total_pages}
