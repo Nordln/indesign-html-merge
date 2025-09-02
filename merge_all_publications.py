@@ -159,27 +159,47 @@ def merge_html_pages(publication_files, output_path):
         
         /* Print media queries */
         @media print {
+            /* Hide navigation elements */
             .separator, .nav-button, .goto-container, .current-page-display, .print-container {
                 display: none !important;
+            }
+            
+            /* Reset body and container for print */
+            body {
+                background-color: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            
+            .container {
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
             }
             
             /* Hide all pages by default */
             .publication {
                 display: none !important;
-                page-break-after: always;
-                margin: 0;
+                position: static !important;
                 width: 100% !important;
                 height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                page-break-after: always;
             }
             
-            /* Show only the page marked for printing - higher specificity */
+            /* Show only the page marked for printing */
             .publication.print-active {
                 display: block !important;
-                page-break-after: auto;
+                position: static !important;
+                visibility: visible !important;
+                opacity: 1 !important;
             }
             
-            body {
-                background-color: white !important;
+            /* Ensure content inside publication is visible */
+            .publication.print-active * {
+                visibility: visible !important;
+                opacity: 1 !important;
             }
         }
     </style>
@@ -238,23 +258,39 @@ def merge_html_pages(publication_files, output_path):
         }
 
         function printSpecificPage(pageNumber) {
+            console.log('Printing page:', pageNumber);
+            
             // Remove print-active class from all pages
             document.querySelectorAll('.publication').forEach(pub => {
                 pub.classList.remove('print-active');
             });
             
             // Add print-active class to the target page
-            const targetPage = document.getElementById('publication-' + (pageNumber - 1));
+            const targetPageId = 'publication-' + (pageNumber - 1);
+            const targetPage = document.getElementById(targetPageId);
+            
+            console.log('Target page ID:', targetPageId);
+            console.log('Target page element:', targetPage);
+            
             if (targetPage) {
                 targetPage.classList.add('print-active');
+                console.log('Added print-active class to:', targetPage);
                 
-                // Trigger print dialog
-                window.print();
-                
-                // Clean up after print dialog closes
+                // Add a small delay to ensure CSS is applied
                 setTimeout(() => {
-                    targetPage.classList.remove('print-active');
-                }, 1000);
+                    // Trigger print dialog
+                    window.print();
+                    
+                    // Clean up after print dialog closes
+                    setTimeout(() => {
+                        targetPage.classList.remove('print-active');
+                        console.log('Removed print-active class');
+                    }, 1000);
+                }, 100);
+            } else {
+                console.error('Could not find page element with ID:', targetPageId);
+                alert('Could not find page to print. Available pages: ' +
+                      Array.from(document.querySelectorAll('.publication')).map(p => p.id).join(', '));
             }
         }
 
