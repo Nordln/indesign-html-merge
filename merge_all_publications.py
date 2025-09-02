@@ -180,43 +180,22 @@ def merge_html_pages(publication_files, output_path):
             /* Hide all pages by default */
             .publication {
                 display: none !important;
-                position: static !important;
-                width: 100% !important;
-                height: auto !important;
-                margin: 0 !important;
-                padding: 0 !important;
                 page-break-after: always;
             }
             
             /* Show only the page marked for printing */
             .publication.print-active {
                 display: block !important;
-                position: static !important;
-                visibility: visible !important;
-                opacity: 1 !important;
             }
             
-            /* Hide InDesign interactive elements that are hidden by default */
-            .publication.print-active ._idGenStateHide,
-            .publication.print-active [class*="_idGenButton"]._idGenStateHide,
-            .publication.print-active [style*="scale(0.05)"],
-            .publication.print-active [style*="transform: translate"][style*="scale(0.05)"],
-            .publication.print-active audio,
-            .publication.print-active [class*="_idGenObjectAttribute-3"] {
+            /* Hide only the specific InDesign interactive elements that should be hidden */
+            ._idGenStateHide {
                 display: none !important;
-                visibility: hidden !important;
             }
             
-            /* Ensure visible content is properly displayed */
-            .publication.print-active > div:not(._idGenStateHide):not([class*="_idGenButton"]) {
-                visibility: visible !important;
-                opacity: 1 !important;
-            }
-            
-            /* Reset transforms for visible elements */
-            .publication.print-active div:not([style*="scale(0.05)"]) {
-                transform: none !important;
-                position: static !important;
+            /* Hide audio controls */
+            audio {
+                display: none !important;
             }
         }
     </style>
