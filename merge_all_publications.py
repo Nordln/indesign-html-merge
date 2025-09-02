@@ -119,66 +119,6 @@ def merge_html_pages(publication_files, output_path):
             text-align: center;
             font-size: 14px;
         }
-        
-        /* Floating Zoom-Out Button Styles */
-        .zoom-out-button {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            background-color: rgba(0, 0, 0, 0.8);
-            border: 2px solid rgba(255, 255, 255, 0.9);
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        .zoom-out-button:hover {
-            background-color: rgba(0, 0, 0, 0.9);
-            border-color: rgba(255, 255, 255, 1);
-            transform: scale(1.05);
-        }
-        
-        .zoom-out-button:active {
-            transform: scale(0.95);
-            background-color: rgba(50, 50, 50, 0.9);
-        }
-        
-        .zoom-out-button svg {
-            width: 24px;
-            height: 24px;
-            fill: white;
-            stroke: white;
-            stroke-width: 1;
-        }
-        
-        /* Animation for button press feedback */
-        .zoom-out-button.pressed {
-            animation: zoomButtonPress 0.15s ease;
-        }
-        
-        @keyframes zoomButtonPress {
-            0% { transform: scale(1); }
-            50% { transform: scale(0.9); background-color: rgba(0, 123, 255, 0.9); }
-            100% { transform: scale(1); }
-        }
-        
-        /* Ensure button is accessible on all screen sizes */
-        @media (max-width: 480px) {
-            .zoom-out-button {
-                top: 15px;
-                right: 15px;
-                width: 48px;
-                height: 48px;
-            }
-        }
     </style>
     <script type="text/javascript">
         function scrollToPage(pageId) {
@@ -226,98 +166,15 @@ def merge_html_pages(publication_files, output_path):
             input.value = '';
         }
         
-        // Floating Zoom-Out Button Functionality
-        function resetBrowserZoom() {
-            try {
-                // Method 1: Direct zoom reset (Chrome/WebKit)
-                if (document.body.style.zoom !== undefined) {
-                    document.body.style.zoom = '1';
-                }
-                
-                // Method 2: CSS transform reset
-                if (document.body.style.transform !== undefined) {
-                    document.body.style.transform = 'scale(1)';
-                }
-                
-                // Method 3: Viewport meta tag manipulation (Safari fallback)
-                let viewport = document.querySelector('meta[name="viewport"]');
-                if (!viewport) {
-                    viewport = document.createElement('meta');
-                    viewport.name = 'viewport';
-                    document.head.appendChild(viewport);
-                }
-                viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
-                
-                // Method 4: Force viewport reset by temporarily changing content
-                setTimeout(function() {
-                    viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=yes';
-                }, 100);
-                
-                // Method 5: Reset scroll position to top
-                window.scrollTo(0, 0);
-                
-                // Visual feedback
-                const button = document.getElementById('zoom-out-btn');
-                if (button) {
-                    button.classList.add('pressed');
-                    setTimeout(function() {
-                        button.classList.remove('pressed');
-                    }, 150);
-                }
-                
-                return true;
-            } catch (error) {
-                console.warn('Zoom reset failed:', error);
-                return false;
-            }
-        }
-        
-        function initializeZoomButton() {
-            const button = document.getElementById('zoom-out-btn');
-            if (button) {
-                // Touch events for mobile
-                button.addEventListener('touchstart', function(e) {
-                    e.preventDefault();
-                    resetBrowserZoom();
-                }, { passive: false });
-                
-                // Click events for desktop
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    resetBrowserZoom();
-                });
-                
-                // Prevent context menu on long press
-                button.addEventListener('contextmenu', function(e) {
-                    e.preventDefault();
-                });
-            }
-        }
-        
         // Register interactive handlers from original script and add our navigation
         function initializeNavigation() {
             if (typeof RegisterInteractiveHandlers === 'function') {
                 RegisterInteractiveHandlers();
             }
-            
-            // Initialize zoom button after DOM is ready
-            initializeZoomButton();
         }
     </script>
 </head>
 <body onload="initializeNavigation();">
-    <!-- Floating Zoom-Out Button -->
-    <button id="zoom-out-btn" class="zoom-out-button" title="Reset Zoom" aria-label="Reset browser zoom to 100%">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <!-- Magnifying glass circle -->
-            <circle cx="11" cy="11" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
-            <!-- Magnifying glass handle -->
-            <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            <!-- Minus sign inside the magnifying glass -->
-            <line x1="8" y1="11" x2="14" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-    </button>
-    
     <div class="container">
 """
     
