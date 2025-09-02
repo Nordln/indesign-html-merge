@@ -163,21 +163,19 @@ def merge_html_pages(publication_files, output_path):
                 display: none !important;
             }
             
+            /* Hide all pages by default */
             .publication {
+                display: none !important;
                 page-break-after: always;
                 margin: 0;
                 width: 100% !important;
                 height: auto !important;
             }
             
-            /* Hide all pages by default */
-            .publication {
-                display: none !important;
-            }
-            
-            /* Show only the page marked for printing */
+            /* Show only the page marked for printing - higher specificity */
             .publication.print-active {
                 display: block !important;
+                page-break-after: auto;
             }
             
             body {
