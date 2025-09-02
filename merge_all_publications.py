@@ -169,12 +169,17 @@ def merge_html_pages(publication_files, output_path):
                 background-color: white !important;
                 margin: 0 !important;
                 padding: 0 !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: flex-start !important;
             }
             
             .container {
-                width: 100% !important;
+                width: auto !important;
                 margin: 0 !important;
-                padding: 0 !important;
+                padding: 20px !important;
+                display: flex !important;
+                justify-content: center !important;
             }
             
             /* Hide all pages by default */
@@ -183,11 +188,13 @@ def merge_html_pages(publication_files, output_path):
                 page-break-after: always;
             }
             
-            /* Show only the page marked for printing with very modest scaling */
+            /* Show only the page marked for printing with proper scaling and centering */
             .publication.print-active {
                 display: block !important;
-                transform: scale(1.1) !important;
-                transform-origin: top left !important;
+                transform: scale(0.95) !important;
+                transform-origin: center top !important;
+                margin: 0 auto !important;
+                width: fit-content !important;
             }
             
             /* Hide only the specific InDesign interactive elements that should be hidden */
