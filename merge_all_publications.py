@@ -75,7 +75,7 @@ def merge_html_pages(publication_files, output_path):
             margin-bottom: 20px;
         }
         .separator {
-            height: 40px;
+            height: 30px;
             background-color: #f0f0f0;
             border-top: 1px solid #ccc;
             border-bottom: 1px solid #ccc;
