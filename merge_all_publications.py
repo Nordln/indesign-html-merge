@@ -365,13 +365,13 @@ def merge_html_pages(publication_files, output_path):
                         <input type="number" class="goto-input" id="{input_id}" min="1" max="{total_pages}" placeholder="1-{total_pages}">
                         <button class="nav-button" onclick="{goto_onclick}">Go</button>
                     </div>
-                    <button class="nav-button" {next_disabled} onclick="{next_onclick}">Next Page</button>
                     <div class="print-container">
                         <button class="nav-button print-button" onclick="printCurrentPage()">Print Current Page</button>
                     </div>
                     <div class="current-page-display">
                         Page {display_page_number} of {total_pages}
                     </div>
+                    <button class="nav-button" {next_disabled} onclick="{next_onclick}">Next Page</button>
                 </div>
 '''
     
