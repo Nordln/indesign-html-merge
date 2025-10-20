@@ -4,6 +4,7 @@
 
 __author__      = "Ed Watson"
 __copyright__   = "CC-BY-SA-4.0 license"
+__comments__    = "10/20/24 EW: 1.1v added loader"
 
 import os
 import re
@@ -49,6 +50,78 @@ def read_inflate_js():
 # JavaScript for client-side decoding and handling
 DECODER_JS = """
 <script>
+// Create and show loading screen immediately
+(function() {
+    // Create a style element for the loader
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            font-family: sans-serif;
+            text-align: center;
+            color: #ffffff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        #loading-spinner {
+            border: 5px solid #444444;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 64px;
+            height: 64px;
+            animation: spin 1.2s linear infinite;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
+        }
+        
+        #loading-text {
+            font-size: 20px;
+            font-weight: 500;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+    `;
+    
+    // Insert the style tag into the document head
+    document.head.appendChild(style);
+    
+    // Create HTML for the loader - this will be inserted before any other content
+    const loaderHTML = `
+        <div id="loading-overlay">
+            <div style="text-align: center;">
+                <div id="loading-spinner"></div>
+                <div id="loading-text"> Laden ...</div>
+            </div>
+        </div>
+    `;
+    
+    // Insert the loader HTML at the beginning of the document
+    // This ensures it's available immediately, before the DOM is fully loaded
+    document.write(loaderHTML);
+    
+    // Set timeout for long-loading feedback
+    setTimeout(function() {
+        const loaderText = document.getElementById('loading-text');
+        if (loaderText && !loaderText.textContent.includes('Please wait')) {
+            loaderText.textContent = 'Content is taking longer than expected. Please wait...';
+        }
+    }, 3000);
+})();
+
 // Base85 decoder
 const base85Chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!#$%&()*+-;<=>?@^_`{|}~";
 function decodeBase85(encoded) {
@@ -64,11 +137,10 @@ function decodeBase85(encoded) {
         let value = 0;
         for (let j = 0; j < chunk.length; j++) {
             let charIndex = base85Chars.indexOf(chunk[j]);
-            if (charIndex === -1) continue; // Skip invalid characters
+            if (charIndex === -1) continue;
             value = value * 85 + charIndex;
         }
         
-        // Extract bytes from the value
         for (let j = 3; j >= 0; j--) {
             if (resultIndex < result.length) {
                 result[resultIndex++] = (value >> (j * 8)) & 0xFF;
@@ -93,16 +165,12 @@ function arrayBufferToBase64(buffer) {
 // Decompress gzipped data
 function decompressGzip(compressedData) {
     try {
-        // Use unzipo library for decompression if available
         if (typeof unzipo !== 'undefined') {
-            // Convert base64 to array buffer
             const binaryString = atob(compressedData);
             const bytes = new Uint8Array(binaryString.length);
             for (let i = 0; i < binaryString.length; i++) {
                 bytes[i] = binaryString.charCodeAt(i);
             }
-            
-            // Decompress
             const decompressed = unzipo.inflate(bytes);
             return arrayBufferToBase64(decompressed);
         } else {
@@ -115,11 +183,66 @@ function decompressGzip(compressedData) {
     }
 }
 
+// Hide loading screen and reveal page content
+function hideLoading() {
+    const loader = document.getElementById('loading-overlay');
+    if (loader) {
+        loader.style.opacity = '0';
+        loader.style.transition = 'opacity 0.3s ease-out';
+        setTimeout(() => {
+            try {
+                if (loader.parentNode) {
+                    loader.parentNode.removeChild(loader);
+                }
+            } catch (e) {
+                console.warn('Failed to remove loading overlay:', e);
+            }
+        }, 300);
+    } else {
+        console.warn('Loading overlay not found');
+    }
+
+    // Reveal page content
+    const pageContent = document.getElementById('page-content');
+    if (pageContent) {
+        pageContent.style.opacity = '1';
+        pageContent.style.pointerEvents = 'auto';
+    } else {
+        // If page-content doesn't exist, create it as a fallback
+        const body = document.querySelector('body');
+        if (body && body.children.length > 0) {
+            const contentDiv = document.createElement('div');
+            contentDiv.id = 'page-content';
+            contentDiv.style.opacity = '1';
+            contentDiv.style.pointerEvents = 'auto';
+            
+            // Move all children except the loader to the content div
+            Array.from(body.children).forEach(child => {
+                if (child.id !== 'loading-overlay') {
+                    contentDiv.appendChild(child);
+                }
+            });
+            
+            body.appendChild(contentDiv);
+        }
+    }
+}
+
 // Process all optimized content when the page loads
 document.addEventListener('DOMContentLoaded', function() {
+
     // Process all elements with data-optimized attributes
     const elements = document.querySelectorAll('[data-optimized-src]');
     
+    let processedCount = 0;
+    const totalElements = elements.length;
+
+    if (totalElements === 0) {
+        // No optimized content — reveal page immediately
+        hideLoading();
+        return;
+    }
+
     elements.forEach(function(element) {
         const encodedData = element.getAttribute('data-optimized-src');
         const encoding = element.getAttribute('data-encoding') || 'base64';
@@ -128,38 +251,46 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (encodedData && mimeType) {
             try {
-                // Decode the data based on encoding type
                 let decodedData;
                 if (encoding === 'base85') {
                     decodedData = decodeBase85(encodedData);
                     decodedData = arrayBufferToBase64(decodedData);
                 } else {
-                    // Already base64
                     decodedData = encodedData;
                 }
                 
-                // Decompress if needed
                 if (compression === 'gzip') {
                     decodedData = decompressGzip(decodedData);
                 }
                 
-                // Create data URI
                 const dataUri = 'data:' + mimeType + ';base64,' + decodedData;
                 
-                // Set the appropriate attribute based on element type
                 if (element.tagName === 'IMG') {
-                    // For img tags, always set the src attribute (required by HTML5)
                     element.src = dataUri;
                 } else if (element.tagName === 'SOURCE') {
                     element.srcset = dataUri;
                 } else if (element.tagName === 'AUDIO') {
                     element.src = dataUri;
                 } else {
-                    // For other elements with background images in style
                     element.style.backgroundImage = 'url(' + dataUri + ')';
+                }
+                
+                processedCount++;
+                
+                if (processedCount === totalElements) {
+                    hideLoading();
                 }
             } catch (err) {
                 console.error('Error processing optimized content:', err);
+                processedCount++;
+                if (processedCount === totalElements) {
+                    hideLoading();
+                }
+            }
+        } else {
+            processedCount++;
+            if (processedCount === totalElements) {
+                hideLoading();
             }
         }
     });
@@ -741,6 +872,31 @@ def process_data_uri(match, tag_name=None, options=None):
         print(f"Error processing data URI: {e}")
         return data_uri  # Return original on error
 
+def wrap_body_content(html_content):
+    """
+    Wrap the entire body content in a div with id="page-content" and set it to invisible
+    """
+    # Find the opening <body> tag (case-insensitive)
+    body_open = re.search(r'<body[^>]*>', html_content, re.IGNORECASE)
+    if not body_open:
+        return html_content  # No <body> found, return unchanged
+
+    # Find the closing </body>
+    body_close = html_content.rfind('</body>')
+    if body_close == -1:
+        return html_content  # No closing </body>, return unchanged
+
+    # Extract the body content
+    head_part = html_content[:body_open.end()]
+    body_content = html_content[body_open.end():body_close]
+    tail_part = html_content[body_close:]
+
+    # Wrap body content in a hidden div
+    wrapped_body = f'<div id="page-content" style="opacity:0; pointer-events:none; transition: opacity 0.3s ease-in-out;">{body_content}</div>'
+
+    # Reconstruct the HTML
+    return head_part + wrapped_body + tail_part
+
 def optimize_html_file(input_path, output_path, options=None, inflate_js_content=None):
     """Optimize base64 content in an HTML file"""
     if options is None:
@@ -791,6 +947,9 @@ def optimize_html_file(input_path, output_path, options=None, inflate_js_content
         decoder_js_start = DECODER_JS.split("{inflate_js_content}")[0]
         decoder_js_end = DECODER_JS.split("{inflate_js_content}")[1]
         complete_decoder_js = decoder_js_start + inflate_js_content + decoder_js_end
+
+        # After processing HTML content (e.g., after optimizing images/audio)
+        html_content = wrap_body_content(html_content)
         
         # Add decoder JavaScript before closing body tag
         if '</body>' in html_content:

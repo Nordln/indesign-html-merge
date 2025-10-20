@@ -4,6 +4,8 @@
 
 __author__      = "Ed Watson"
 __copyright__   = "CC-BY-SA-4.0 license"
+__version__     = "1.1"
+__comments__    = "10/20/24 EW: 1.1v Updates - bar colors, font-size, audio stopall, lang (EN->DE), print bg alert"
 
 import os
 import re
@@ -89,13 +91,13 @@ def merge_html_pages(publication_files, output_path):
             padding: 10px;
         }
         .nav-button {
-            background-color: #007bff;
+            background-color: #0083BB;
             color: white;
             border: none;
             padding: 8px 16px;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
             transition: background-color 0.3s;
         }
@@ -110,6 +112,7 @@ def merge_html_pages(publication_files, output_path):
             display: flex;
             align-items: center;
             gap: 5px;
+            font-size: 12px
         }
         .goto-input {
             width: 50px;
@@ -117,11 +120,11 @@ def merge_html_pages(publication_files, output_path):
             border: 1px solid #ccc;
             border-radius: 4px;
             text-align: center;
-            font-size: 14px;
+            font-size: 12px;
         }
         .current-page-display {
             margin-left: 20px;
-            font-size: 16px;
+            font-size: 12px;
             font-weight: bold;
             color: #333;
             display: flex;
@@ -129,7 +132,7 @@ def merge_html_pages(publication_files, output_path):
         }
         .current-page-display {
             margin-left: 20px;
-            font-size: 16px;
+            font-size: 12px;
             font-weight: bold;
             color: #333;
             display: flex;
@@ -142,9 +145,8 @@ def merge_html_pages(publication_files, output_path):
             margin-left: 15px;
         }
         .print-button {
-            background-color: #28a745;
+            background-color: #3FA353;
             font-size: 12px;
-            padding: 6px 12px;
         }
         .print-button:hover {
             background-color: #218838;
@@ -239,7 +241,7 @@ def merge_html_pages(publication_files, output_path):
             const pageNumber = parseInt(input.value);
             
             if (isNaN(pageNumber) || pageNumber < 1 || pageNumber > totalPages) {
-                alert('Please enter a valid page number between 1 and ' + totalPages);
+                alert('Bitte geben Sie eine gültige Seitenzahl zwischen 1 und ' + totalPages);
                 input.value = '';
                 return;
             }
@@ -249,13 +251,15 @@ def merge_html_pages(publication_files, output_path):
         }
         
         function printCurrentPage() {
+            // Alert user to enable background printing
+            alert('Um eine korrekte Formatierung beim Drucken zu gewährleisten, aktivieren Sie bitte "Hintergrunddruck" in Ihrem Druckerdialog.');
             // Get the currently visible page
             const currentPageNumber = getCurrentVisiblePage();
             printSpecificPage(currentPageNumber);
         }
 
         function printSpecificPage(pageNumber) {
-            console.log('Printing page:', pageNumber);
+            console.log('Seite drucken:', pageNumber);
             
             // Remove print-active class from all pages
             document.querySelectorAll('.publication').forEach(pub => {
@@ -286,7 +290,7 @@ def merge_html_pages(publication_files, output_path):
                 }, 100);
             } else {
                 console.error('Could not find page element with ID:', targetPageId);
-                alert('Could not find page to print. Available pages: ' +
+                alert('Die zu druckende Seite konnte nicht gefunden werden. Verfügbare Seiten: ' +
                       Array.from(document.querySelectorAll('.publication')).map(p => p.id).join(', '));
             }
         }
@@ -317,6 +321,18 @@ def merge_html_pages(publication_files, output_path):
             if (typeof RegisterInteractiveHandlers === 'function') {
                 RegisterInteractiveHandlers();
             }
+        
+            document.querySelectorAll('.goto-input').forEach(input => {
+                input.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter' || event.keyCode === 13) {
+                        event.preventDefault();
+                        const separator = this.closest('.separator');
+                        const totalPages = parseInt(separator.getAttribute('data-total-pages'));
+                        const inputId = this.id;
+                        goToSpecificPage(inputId, totalPages);
+                    }
+                });
+            });
         }
     </script>
 </head>
@@ -362,20 +378,20 @@ def merge_html_pages(publication_files, output_path):
                 input_id = f"goto-input-{display_page_number}"
                 goto_onclick = f"goToSpecificPage('{input_id}', {total_pages})"
                 
-                merged_html += f'''<div class="separator">
-                    <button class="nav-button" {prev_disabled} onclick="{prev_onclick}">Previous Page</button>
+                merged_html += f'''<div class="separator" data-total-pages="{total_pages}">
+                    <button class="nav-button" {prev_disabled} onclick="{prev_onclick}">Vorherige Seite</button>
                     <div class="goto-container">
-                        <span>Go to page:</span>
+                        <span>Geh zu Seite</span>
                         <input type="number" class="goto-input" id="{input_id}" min="1" max="{total_pages}" placeholder="1-{total_pages}">
-                        <button class="nav-button" onclick="{goto_onclick}">Go</button>
+                        <button class="nav-button" onclick="{goto_onclick}">Geh</button>
                     </div>
                     <div class="print-container">
-                        <button class="nav-button print-button" onclick="printCurrentPage()">Print Current Page</button>
+                        <button class="nav-button print-button" onclick="printCurrentPage()">Aktuelle Seite drucken</button>
                     </div>
                     <div class="current-page-display">
-                        Page {display_page_number} of {total_pages}
+                        Seite {display_page_number} von {total_pages}
                     </div>
-                    <button class="nav-button" {next_disabled} onclick="{next_onclick}">Next Page</button>
+                    <button class="nav-button" {next_disabled} onclick="{next_onclick}">Nächste Seite</button>
                 </div>
 '''
     
