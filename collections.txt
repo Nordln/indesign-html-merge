@@ -1,0 +1,6 @@
+# Example collections.txt file
+# List one collection directory per line
+# Each collection should have the structure: collection_name/InDesign_master/publication-web-resources/html/
+
+col1
+col2

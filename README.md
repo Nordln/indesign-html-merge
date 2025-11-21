@@ -34,9 +34,15 @@ The optimisation process consists of four sequential steps:
 4. **Optionally, convert PNG images to JPEG** for further size reduction
 
 ## Step-by-Step Process
-This workflow assumes you have created a multipage interactive design using Adobe Indesign, and have used the ``file -> export -> HTML5`` export option. These scripts are intended to be run from ``publication-web-resources/html/`` folder of the export, where the publication*.html files are placed. It is important that the files in the parent folders are present, since they are heavily referened in the html files. The first html page needs to be renamed from ``publication.html`` to ``publication-0.html`` to be visible to the merge script.
+This workflow assumes you have created a multipage interactive design using Adobe Indesign, and have used the ``file -> export -> HTML5`` export option. These scripts are intended to be run from ``publication-web-resources/html/`` folder of the export, where the publication*.html files are placed. It is important that the files in the parent folders are present, since they are heavily referenced in the html files.
+
+**Note:** As of v2.1, the script automatically detects `publication.html` (InDesign's default first page name) and treats it as page 0, so manual renaming is no longer required.
 
 ### 1. Merge Publications
+
+The script supports two modes of operation:
+
+#### Original Mode (Single Directory)
 
 ```bash
 python merge_all_publications.py
@@ -47,6 +53,32 @@ This script:
 - Sorts them by page number
 - Merges them into a single scrollable HTML page with navigation between sections
 - Outputs the merged file as `merged-publication.html`
+
+#### Collections Mode (Multiple Directories)
+
+To merge publications from multiple collections, create a `collections.txt` file in the same directory as the script:
+
+```bash
+# collections.txt example
+collection1
+collection2
+collection3
+```
+
+Each collection should have the structure: `collection_name/InDesign_master/publication-web-resources/html/`
+
+Then run:
+```bash
+python merge_all_publications.py
+```
+
+The script will automatically detect `collections.txt` and:
+- Process each collection directory in the order listed
+- Find all publication files in each collection's html directory
+- Merge all pages from all collections into a single HTML file with continuous page numbering
+- Output the merged file as `merged-publication.html`
+
+**Note:** Lines starting with `#` in `collections.txt` are treated as comments and ignored.
 
 ### 2. Embed Resources with Monolith
 
@@ -96,10 +128,31 @@ This script:
 Merges multiple HTML files exported from Adobe InDesign into a single scrollable document with navigation between pages.
 
 **Features:**
+- **Automatic File Detection**: Recognizes both `publication.html` and `publication-X.html` formats (no more manual renaming required)
+- **Dual Mode Operation**: Automatically detects `collections.txt` and switches between single directory mode and collections mode
+- **Collections Support**: Process multiple collections in a specified order, merging all pages with continuous numbering
+- **Smart Conflict Resolution**: If both `publication.html` and `publication-0.html` exist, prioritizes the numbered version
 - Automatically finds and sorts publication files by page number
 - Creates a clean, navigable interface between pages
 - Preserves original content and styling
 - Adds JavaScript for smooth scrolling between sections
+
+**Collections Mode Structure:**
+Each collection directory should follow this structure:
+```
+collection_name/
+└── InDesign_master/
+    └── publication-web-resources/
+        └── html/
+            ├── publication.html (or publication-0.html)
+            ├── publication-1.html
+            └── ...
+```
+
+**Version History:**
+- v2.1 (11/21/24): Auto-detect `publication.html` as page 0 (no manual renaming required)
+- v2.0 (11/21/24): Added support for collections.txt to merge multiple collections
+- v1.1 (10/20/24): Bar colors, font-size, audio stopall, lang (EN->DE), print bg alert
 
 ### optimise_base64_image_audio.py
 

@@ -4,40 +4,199 @@
 
 __author__      = "Ed Watson"
 __copyright__   = "CC-BY-SA-4.0 license"
-__version__     = "1.1"
-__comments__    = "10/20/24 EW: 1.1v Updates - bar colors, font-size, audio stopall, lang (EN->DE), print bg alert"
+__version__     = "2.2"
+__comments__    = "11/21/24 EW: 2.2v Updates - Copy resources to common location in collections mode; 2.1v - Auto-detect publication.html; 2.0v - Added collections.txt support"
 
 import os
 import re
+import shutil
 from bs4 import BeautifulSoup
 
-def find_publication_files():
+def extract_page_number_from_filename(filename):
     """
-    Find all HTML files in the current directory that match the pattern "-[number].html"
-    and sort them by page number.
+    Extract page number from publication filename.
+    Handles both 'publication-X.html' and 'publication.html' formats.
+    
+    Args:
+        filename (str): The filename to extract page number from
+        
+    Returns:
+        int or None: Page number if found, None otherwise
+    """
+    # Check for numbered format: publication-X.html
+    numbered_pattern = re.compile(r'publication-(\d+)\.html$')
+    match = numbered_pattern.search(filename)
+    if match:
+        return int(match.group(1))
+    
+    # Check for unnumbered format: publication.html (treat as page 0)
+    if filename == 'publication.html':
+        return 0
+    
+    return None
+
+def read_collections_file(collections_file='collections.txt'):
+    """
+    Read and parse the collections.txt file to get list of collection directories.
+    
+    Args:
+        collections_file (str): Path to the collections file
+        
+    Returns:
+        list: List of collection directory names (one per line, stripped of whitespace)
+    """
+    if not os.path.exists(collections_file):
+        return None
+    
+    collections = []
+    with open(collections_file, 'r', encoding='utf-8') as f:
+        for line in f:
+            line = line.strip()
+            # Skip empty lines and comments
+            if line and not line.startswith('#'):
+                collections.append(line)
+    
+    return collections if collections else None
+
+def find_publication_files(directory=None):
+    """
+    Find all HTML files in the specified directory that match publication patterns
+    and sort them by page number. Handles both 'publication-X.html' and 'publication.html' formats.
+    If both 'publication.html' and 'publication-0.html' exist, prioritizes the numbered version.
+    
+    Args:
+        directory (str): Directory to search in. If None, uses current directory.
     
     Returns:
         list: Sorted list of publication file paths
     """
-    current_dir = os.getcwd()
+    search_dir = directory if directory else os.getcwd()
     publication_files = []
-    
-    # Regular expression to match files with pattern "-[number].html"
-    pattern = re.compile(r'publication-(\d+)\.html$')
+    page_numbers_found = set()
     
     # Find all matching files
-    for filename in os.listdir(current_dir):
-        match = pattern.search(filename)
-        if match:
-            page_number = int(match.group(1))
-            file_path = os.path.join(current_dir, filename)
-            publication_files.append((page_number, file_path))
+    if os.path.exists(search_dir):
+        for filename in os.listdir(search_dir):
+            page_number = extract_page_number_from_filename(filename)
+            
+            if page_number is not None:
+                file_path = os.path.join(search_dir, filename)
+                
+                # If this is page 0, check if we already have publication-0.html
+                if page_number == 0 and filename == 'publication.html':
+                    # Only add publication.html if publication-0.html doesn't exist
+                    if 0 not in page_numbers_found:
+                        publication_files.append((page_number, file_path))
+                        page_numbers_found.add(page_number)
+                else:
+                    # For numbered files, always add (and replace publication.html if it was added for page 0)
+                    if page_number == 0 and page_number in page_numbers_found:
+                        # Remove publication.html entry and add publication-0.html
+                        publication_files = [(pn, fp) for pn, fp in publication_files if pn != 0]
+                    publication_files.append((page_number, file_path))
+                    page_numbers_found.add(page_number)
     
     # Sort files by page number
     publication_files.sort(key=lambda x: x[0])
     
     # Return just the file paths in sorted order
     return [file_path for _, file_path in publication_files]
+
+def collect_all_publication_files_from_collections(collections):
+    """
+    Collect all publication files from multiple collections in the order specified.
+    Each collection should have the structure: collection_name/InDesign_master/publication-web-resources/html/
+    
+    Args:
+        collections (list): List of collection directory names
+        
+    Returns:
+        list: Sorted list of all publication file paths from all collections
+    """
+    all_files = []
+    
+    for collection in collections:
+        # Build path to the html directory within the collection
+        html_dir = os.path.join(collection, 'InDesign_master', 'publication-web-resources', 'html')
+        
+        if not os.path.exists(html_dir):
+            print(f"Warning: Collection directory not found: {html_dir}")
+            continue
+        
+        # Find publication files in this collection
+        collection_files = find_publication_files(html_dir)
+        
+        if collection_files:
+            print(f"Found {len(collection_files)} files in collection: {collection}")
+            all_files.extend(collection_files)
+        else:
+            print(f"Warning: No publication files found in collection: {collection}")
+    
+    return all_files
+
+def copy_collection_resources(collections, output_dir):
+    """
+    Copy CSS, JavaScript, and other resources from all collections to a common location.
+    
+    Args:
+        collections (list): List of collection directory names
+        output_dir (str): Directory where merged-publication.html will be created
+        
+    Returns:
+        str: Path to the common resources directory
+    """
+    # Create publication-web-resources directory structure
+    resources_dir = os.path.join(output_dir, 'publication-web-resources')
+    css_dir = os.path.join(resources_dir, 'css')
+    script_dir = os.path.join(resources_dir, 'script')
+    image_dir = os.path.join(resources_dir, 'image')
+    
+    # Create directories if they don't exist
+    os.makedirs(css_dir, exist_ok=True)
+    os.makedirs(script_dir, exist_ok=True)
+    os.makedirs(image_dir, exist_ok=True)
+    
+    print("\nCopying resources from collections...")
+    
+    for collection in collections:
+        collection_resources = os.path.join(collection, 'InDesign_master', 'publication-web-resources')
+        
+        if not os.path.exists(collection_resources):
+            print(f"Warning: Resources directory not found for collection: {collection}")
+            continue
+        
+        # Copy CSS files
+        collection_css = os.path.join(collection_resources, 'css')
+        if os.path.exists(collection_css):
+            for item in os.listdir(collection_css):
+                src = os.path.join(collection_css, item)
+                dst = os.path.join(css_dir, item)
+                if os.path.isfile(src):
+                    shutil.copy2(src, dst)
+                    print(f"  Copied CSS: {item}")
+        
+        # Copy JavaScript files
+        collection_script = os.path.join(collection_resources, 'script')
+        if os.path.exists(collection_script):
+            for item in os.listdir(collection_script):
+                src = os.path.join(collection_script, item)
+                dst = os.path.join(script_dir, item)
+                if os.path.isfile(src):
+                    shutil.copy2(src, dst)
+                    print(f"  Copied Script: {item}")
+        
+        # Copy image files
+        collection_image = os.path.join(collection_resources, 'image')
+        if os.path.exists(collection_image):
+            for item in os.listdir(collection_image):
+                src = os.path.join(collection_image, item)
+                dst = os.path.join(image_dir, item)
+                if os.path.isfile(src):
+                    shutil.copy2(src, dst)
+                    print(f"  Copied Image: {item}")
+    
+    print("Resource copying complete.\n")
+    return resources_dir
 
 def merge_html_pages(publication_files, output_path):
     """
@@ -57,8 +216,8 @@ def merge_html_pages(publication_files, output_path):
 <head>
     <meta charset="utf-8" />
     <title>HTML5 Publication</title>
-    <link href="../css/idGeneratedStyles.css" rel="stylesheet" type="text/css" />
-    <script src="../script/idGeneratedScript.js" type="text/javascript"></script>
+    <link href="publication-web-resources/css/idGeneratedStyles.css" rel="stylesheet" type="text/css" />
+    <script src="publication-web-resources/script/idGeneratedScript.js" type="text/javascript"></script>
     <style>
         body {
             margin: 0;
@@ -343,7 +502,8 @@ def merge_html_pages(publication_files, output_path):
     # Process each publication file
     for index, file_path in enumerate(publication_files, 1):
         # Extract page number from filename for the ID (0-based from filename)
-        file_page_number = os.path.basename(file_path).split('-')[1].split('.')[0]
+        filename = os.path.basename(file_path)
+        file_page_number = extract_page_number_from_filename(filename)
         
         # Use 1-based page numbering for user display
         display_page_number = index
@@ -357,6 +517,33 @@ def merge_html_pages(publication_files, output_path):
         main_content = soup.select_one('div[style*="position:absolute;overflow:hidden"]')
         
         if main_content:
+            # Update image paths in the content to point to the common resources directory
+            # Find all img tags and update their src attributes
+            for img in main_content.find_all('img'):
+                if img.get('src'):
+                    src = img['src']
+                    # If it's a relative path starting with ../image/
+                    if src.startswith('../image/'):
+                        img['src'] = 'publication-web-resources/image/' + src.replace('../image/', '')
+                    # If it's just image/
+                    elif src.startswith('image/'):
+                        img['src'] = 'publication-web-resources/' + src
+            
+            # Find all object/embed tags (for SVG) and update their data/src attributes
+            for obj in main_content.find_all(['object', 'embed']):
+                if obj.get('data'):
+                    data = obj['data']
+                    if data.startswith('../image/'):
+                        obj['data'] = 'publication-web-resources/image/' + data.replace('../image/', '')
+                    elif data.startswith('image/'):
+                        obj['data'] = 'publication-web-resources/' + data
+                if obj.get('src'):
+                    src = obj['src']
+                    if src.startswith('../image/'):
+                        obj['src'] = 'publication-web-resources/image/' + src.replace('../image/', '')
+                    elif src.startswith('image/'):
+                        obj['src'] = 'publication-web-resources/' + src
+            
             # Keep div ID matching the original filename (0-based)
             merged_html += f'<div class="publication" id="publication-{file_page_number}">\n'
             merged_html += str(main_content)
@@ -412,18 +599,43 @@ def main():
     current_dir = os.getcwd()
     output_path = os.path.join(current_dir, 'merged-publication.html')
     
-    # Find all publication files
-    publication_files = find_publication_files()
+    # Check if collections.txt exists
+    collections_file = os.path.join(current_dir, 'collections.txt')
+    collections = read_collections_file(collections_file)
     
-    if publication_files:
-        print(f"Found {len(publication_files)} publication files to merge:")
-        for file_path in publication_files:
-            print(f"  - {os.path.basename(file_path)}")
+    if collections:
+        # Collections mode: merge files from multiple collections
+        print(f"Collections mode: Found {len(collections)} collections in collections.txt")
+        print("Collections to process:")
+        for collection in collections:
+            print(f"  - {collection}")
         
-        # Merge the HTML pages
-        merge_html_pages(publication_files, output_path)
+        # Copy resources from all collections to common location
+        copy_collection_resources(collections, current_dir)
+        
+        publication_files = collect_all_publication_files_from_collections(collections)
+        
+        if publication_files:
+            print(f"Total publications to merge: {len(publication_files)}")
+            
+            # Merge the HTML pages
+            merge_html_pages(publication_files, output_path)
+        else:
+            print("No publication files found in any of the specified collections")
     else:
-        print("No publication files found matching the pattern 'publication-[number].html'")
+        # Original mode: find files in current directory
+        print("Original mode: Searching for publication files in current directory")
+        publication_files = find_publication_files()
+        
+        if publication_files:
+            print(f"Found {len(publication_files)} publication files to merge:")
+            for file_path in publication_files:
+                print(f"  - {os.path.basename(file_path)}")
+            
+            # Merge the HTML pages
+            merge_html_pages(publication_files, output_path)
+        else:
+            print("No publication files found matching the pattern 'publication-[number].html'")
 
 if __name__ == "__main__":
     main()
