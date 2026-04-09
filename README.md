@@ -24,6 +24,22 @@ Example input and output files are provided. A gif is below. You can view the HT
   - [Monolith](https://github.com/Y2Z/monolith) v2.10.1 or higher - A command-line tool for saving web pages as a single HTML file
   - [FFmpeg](https://ffmpeg.org/download.html) v5.1.6 or higher - A command-line tool for converting media files into different formats and bitrates
 
+## Quick reference
+```
+# 1. List one collection directory per line in collections.txt. Each collection folder should have the structure: collection_name/InDesign_master/publication-web-resources/html/
+vim collections.txt
+
+# 2. If first time, setup environment ´
+pip install -r requirements´ via python venv
+
+# 3. Load the environment
+´source venv/bin/activate`. You will see `(venv)` at the start of the command line.
+
+# 4. Run the pipeline
+python merge_all_publications_v2.9.py \
+&& ./monolith-toez -q -s publication-web-resources/font merged-publication.html -o merged-embedded.html --no-frames \
+&& python optimise_base64_image_audio_v1.2.2.py merged-embedded.html -i 75 -a 64 -w
+```
 ## Workflow Overview
 
 The optimisation process consists of four sequential steps:
@@ -82,6 +98,12 @@ The script will automatically detect `collections.txt` and:
 
 ### 2. Embed Resources with Monolith
 
+A Toez fork of the Monolith project was created to allow for specific features for the Toez project, namely, the option to specify the system font dir when using inside a controlled environment like Jupyterlab. This is available on Github: https://github.com/Nordln/monolith-toez 
+
+```bash
+monolith merged-publication.html -o merged-embedded.html --no-frames
+```
+When using the Monolith-toez fork, and where specifying a system font directory:
 ```bash
 monolith merged-publication.html -o merged-embedded.html --no-frames
 ```
