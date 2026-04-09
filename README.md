@@ -24,7 +24,7 @@ Example input and output files are provided. A gif is below. You can view the HT
   - [Monolith](https://github.com/Y2Z/monolith) v2.10.1 or higher - A command-line tool for saving web pages as a single HTML file
   - [FFmpeg](https://ffmpeg.org/download.html) v5.1.6 or higher - A command-line tool for converting media files into different formats and bitrates
 
-## Quick reference
+## Pipeline quick reference
 ```
 # 1. List one collection directory per line in collections.txt. Each collection folder should have the structure: collection_name/InDesign_master/publication-web-resources/html/
 vim collections.txt
