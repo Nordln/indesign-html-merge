@@ -33,7 +33,7 @@ vim collections.txt
 pip install -r requirements´ via python venv
 
 # 3. Load the environment
-´source venv/bin/activate`. You will see `(venv)` at the start of the command line.
+source venv/bin/activate
 
 # 4. Run the pipeline
 python merge_all_publications.py \
