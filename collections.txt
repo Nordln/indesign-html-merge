@@ -1,6 +1,20 @@
-# Example collections.txt file
 # List one collection directory per line
 # Each collection should have the structure: collection_name/InDesign_master/publication-web-resources/html/
+# Environment setup used: ´pip install -r requirements´ via python venv
+# Loading the environment ´source venv/bin/activate`. You will see `(venv)` at the start of the command line.
+# Pipeline command used: ´python merge_all_publications_v2.9.py && ./monolith-toez -q -s publication-web-resources/font merged-publication.html -o merged-embedded.html --no-frames && python optimise_base64_image_audio_v1.2.2.py merged-embedded.html -i 75 -a 64 -w´
 
-col1
-col2
+# title page
+collection1
+
+# content
+collection2
+
+# organisations
+collection3
+
+# height profile
+collection4
+
+# Steckbriefe
+collection5
