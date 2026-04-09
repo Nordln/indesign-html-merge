@@ -171,11 +171,6 @@ collection_name/
             └── ...
 ```
 
-**Version History:**
-- v2.1 (11/21/24): Auto-detect `publication.html` as page 0 (no manual renaming required)
-- v2.0 (11/21/24): Added support for collections.txt to merge multiple collections
-- v1.1 (10/20/24): Bar colors, font-size, audio stopall, lang (EN->DE), print bg alert
-
 ### optimise_base64_image_audio.py
 
 Optimises all base64-encoded content in HTML files, combining image and audio optimisation in a single script.
