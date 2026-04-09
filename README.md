@@ -36,9 +36,9 @@ pip install -r requirements´ via python venv
 ´source venv/bin/activate`. You will see `(venv)` at the start of the command line.
 
 # 4. Run the pipeline
-python merge_all_publications_v2.9.py \
+python merge_all_publications.py \
 && ./monolith-toez -q -s publication-web-resources/font merged-publication.html -o merged-embedded.html --no-frames \
-&& python optimise_base64_image_audio_v1.2.2.py merged-embedded.html -i 75 -a 64 -w
+&& python optimise_base64_image_audio.py merged-embedded.html -i 75 -a 64 -w
 ```
 ## Workflow Overview
 
